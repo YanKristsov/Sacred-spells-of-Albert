@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Первобытные заклинания</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Первобытные заклинания — Природные чары</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* --- Полностью переработанная зелёная гамма --- */
@@ -98,6 +98,8 @@
             flex: 1;
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
         .spell-icon {
@@ -113,6 +115,7 @@
             font-size: 13px;
             font-weight: 600;
             color: #3a6b2f;
+            white-space: nowrap;
         }
         
         .spell-description {
@@ -212,17 +215,6 @@
             font-weight: 600;
         }
         
-        .arrows {
-            display: flex;
-            gap: 3px;
-            margin-left: 5px;
-        }
-        
-        .arrow {
-            color: #5b8c4e;
-            font-size: 12px;
-        }
-        
         .divider {
             height: 1px;
             background-color: #d9e8ce;
@@ -244,13 +236,201 @@
             color: #7aa85a;
         }
         
+        .enhancement {
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .enhancement b {
+            color: #3a6b2f;
+            font-weight: 600;
+            min-width: 100px;
+            display: inline-block;
+        }
+        
+        .enhancement b i {
+            color: #6b9c3a;
+        }
+        
+        .enhancement span {
+            margin-left: 8px;
+            color: #3a553a;
+        }
+        
+        .spell-expandable {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .expanded {
+            display: block;
+        }
+        
+        .components-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .check-button {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #9cbf82;
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .check-button:hover {
+            border-color: #6b9c3a;
+            background-color: #eef5ea;
+            transform: scale(1.02);
+        }
+        
+        .check-button.checked {
+            background-color: #6b9c3a;
+            border-color: #5a854a;
+        }
+        
+        .check-button.checked i {
+            display: block;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .check-button i {
+            display: none;
+        }
+
+        /* Кнопка "Отмеченные" / "Все заклинания" — будет ПЕРВОЙ (слева) */
+        .filter-button {
+            background-color: #eef5ea;
+            color: #3a6b2f;
+            border: 2px solid #bcd0aa;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(60, 80, 40, 0.1);
+        }
+        
+        .filter-button:hover {
+            background-color: #e2eed9;
+            border-color: #8bbb6e;
+            box-shadow: 0 4px 12px rgba(60, 80, 40, 0.15);
+        }
+        
+        .filter-button.filter-active {
+            background-color: #6b9c3a;
+            color: white;
+            border-color: #5a854a;
+        }
+        
+        .filter-button.filter-active:hover {
+            background-color: #5a854a;
+            border-color: #4a703a;
+        }
+
+        /* Кнопка "Раскрыть все" / "Свернуть все" — будет ВТОРОЙ (расположена под кнопкой фильтра) */
+        .expand-all-button {
+            background-color: #eef5ea;
+            color: #3a6b2f;
+            border: 2px solid #bcd0aa;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(60, 80, 40, 0.1);
+        }
+
+        .expand-all-button:hover {
+            background-color: #e2eed9;
+            border-color: #8bbb6e;
+            box-shadow: 0 4px 12px rgba(60, 80, 40, 0.15);
+        }
+
+        .expand-all-button.expanded-all {
+            background-color: #6b9c3a;
+            color: white;
+            border-color: #5a854a;
+        }
+
+        /* Новая панель управления: вертикальное расположение кнопок (сначала "Все заклинания", под ней "Раскрыть все") */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+            background: transparent;
+            width: auto;
+            max-width: 180px;
+        }
+
+        /* Для мобильных устройств — компактнее */
+        @media (max-width: 450px) {
+            .control-panel {
+                top: 15px;
+                left: 15px;
+                gap: 8px;
+            }
+            .filter-button, .expand-all-button {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+            .content-wrapper {
+                margin-top: 95px;
+            }
+        }
+
+        @media (min-width: 451px) {
+            .content-wrapper {
+                margin-top: 85px;
+            }
+        }
+
+        .content-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spell-card.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        
+        /* Доп. стили */
         .reaction-block {
             background-color: #f0f7ea;
             border: 1px solid #cde0bd;
             border-radius: 10px;
             padding: 16px;
             margin: 16px 0;
-            position: relative;
         }
         
         .reaction-header {
@@ -302,278 +482,7 @@
             font-weight: 600;
             color: #2a5c2a;
         }
-        
-        .enhancement {
-            margin-bottom: 10px;
-            font-size: 14px;
-            display: flex;
-            align-items: flex-start;
-        }
-        
-        .enhancement b {
-            color: #3a6b2f;
-            font-weight: 600;
-            min-width: 100px;
-            display: inline-block;
-        }
-        
-        .enhancement b i {
-            color: #6b9c3a;
-        }
-        
-        .enhancement span {
-            margin-left: 8px;
-            color: #3a553a;
-        }
-        
-        .option-block {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f6faf2;
-            border-radius: 8px;
-            border-left: 3px solid #bcd0aa;
-        }
-        
-        .option-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #3a6b2f;
-        }
-        
-        .shield-actions {
-            background-color: #f0f7ea;
-            border: 1px solid #cde0bd;
-            border-radius: 10px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-        
-        .shield-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #3a6b2f;
-            display: flex;
-            align-items: center;
-        }
-        
-        .shield-title i {
-            margin-right: 8px;
-            color: #5b8c4e;
-        }
-        
-        .spell-expandable {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .expanded {
-            display: block;
-        }
-        
-        .components-row {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
 
-        .check-button {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #9cbf82;
-            border-radius: 6px;
-            background-color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-            transition: all 0.2s ease;
-        }
-        
-        .check-button:hover {
-            border-color: #6b9c3a;
-            background-color: #eef5ea;
-        }
-        
-        .check-button.checked {
-            background-color: #6b9c3a;
-            border-color: #5a854a;
-        }
-        
-        .check-button.checked i {
-            display: block;
-            color: white;
-            font-size: 14px;
-        }
-        
-        .check-button i {
-            display: none;
-        }
-
-        .filter-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #eef5ea;
-            color: #3a6b2f;
-            border: 2px solid #bcd0aa;
-            padding: 8px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(60, 80, 40, 0.1);
-        }
-        
-        .filter-button:hover {
-            background-color: #e2eed9;
-            border-color: #8bbb6e;
-            box-shadow: 0 4px 12px rgba(60, 80, 40, 0.15);
-        }
-        
-        .filter-button.filter-active {
-            background-color: #6b9c3a;
-            color: white;
-            border-color: #5a854a;
-        }
-        
-        .filter-button.filter-active:hover {
-            background-color: #5a854a;
-            border-color: #4a703a;
-        }
-
-        .expand-all-button {
-            position: fixed;
-            top: 20px;
-            left: 180px;
-            background-color: #eef5ea;
-            color: #3a6b2f;
-            border: 2px solid #bcd0aa;
-            padding: 8px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(60, 80, 40, 0.1);
-        }
-
-        .expand-all-button:hover {
-            background-color: #e2eed9;
-            border-color: #8bbb6e;
-            box-shadow: 0 4px 12px rgba(60, 80, 40, 0.15);
-        }
-
-        .expand-all-button.expanded-all {
-            background-color: #6b9c3a;
-            color: white;
-            border-color: #5a854a;
-        }
-
-        @media (max-width: 400px) {
-            .expand-all-button {
-                left: 120px;
-                padding: 6px 12px;
-                font-size: 13px;
-            }
-            
-            .filter-button {
-                padding: 6px 12px;
-                font-size: 13px;
-                left: 15px;
-                top: 15px;
-            }
-        }
-
-        .content-wrapper {
-            margin-top: 60px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .spell-card.hidden {
-            display: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @media (max-width: 400px) {
-            body {
-                padding: 15px;
-            }
-            
-            .spell-header {
-                padding: 14px;
-            }
-            
-            .spell-title {
-                font-size: 16px;
-            }
-            
-            .spell-focus {
-                font-size: 13px;
-                padding: 4px 10px;
-            }
-            
-            .spell-info b {
-                min-width: 80px;
-            }
-            
-            .components {
-                flex-wrap: wrap;
-            }
-            
-            .check-button {
-                width: 22px;
-                height: 22px;
-            }
-            
-            .content-wrapper {
-                margin-top: 50px;
-            }
-        }
-        
-        /* Таблица для Обнаружения мировоззрения */
-        .aura-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 13px;
-        }
-        
-        .aura-table th, .aura-table td {
-            border: 1px solid #cde0bd;
-            padding: 6px;
-            text-align: left;
-        }
-        
-        .aura-table th {
-            background-color: #e5f0dd;
-            font-weight: 600;
-            color: #3a6b2f;
-        }
-        
-        /* Стили для полос прокрутки (опционально) */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -594,21 +503,23 @@
         }
     </style>
 </head>
-
 <body>
-    <button class="filter-button" id="filterButton">
-        <i class="fas fa-filter"></i>
-        <span>Отмеченные</span>
-    </button>
-    
-    <button class="expand-all-button" id="expandAllButton">
-        <i class="fas fa-chevron-down"></i>
-        <span>Раскрыть все</span>
-    </button>
+    <!-- Панель с кнопками: первая "Все заклинания" (переключатель фильтра), под ней "Раскрыть все" -->
+    <div class="control-panel">
+        <button class="filter-button" id="filterButton">
+            <i class="fas fa-filter"></i>
+            <span>Отмеченные</span>
+        </button>
+        
+        <button class="expand-all-button" id="expandAllButton">
+            <i class="fas fa-chevron-down"></i>
+            <span>Раскрыть все</span>
+        </button>
+    </div>
 
     <div class="content-wrapper">
         <header>
-            <h1><i class="fas fa-hat-wizard"></i>Первобытные заклинания</h1>
+            <h1><i class="fas fa-hat-wizard"></i> Первобытные заклинания</h1>
         </header>
 
         <!-- ================= РАЗДЕЛ: ПРИРОДНЫЕ ЧАРЫ ================= -->
@@ -9552,22 +9463,28 @@
     </div> <!-- Конец content-wrapper -->
 
     <script>
-        // --- JavaScript (полностью из вашего файла) ---
+        // --- Полноценный функционал: фильтр "отмеченные / все", сохранение в localStorage, раскрытие/сворачивание ---
         let filterActive = false;
         let allExpanded = false;
-        const STORAGE_KEY = 'pathfinder-spells-checked';
+        const STORAGE_KEY = 'pathfinder-spells-checked-v2';
         
-        function toggleSpell(element) {
-            const expandable = element.parentElement.querySelector('.spell-expandable');
+        // Функция переключения содержимого карточки
+        function toggleSpell(headerElement) {
+            const card = headerElement.closest('.spell-card');
+            const expandable = card.querySelector('.spell-expandable');
             if (expandable.classList.contains('expanded')) {
                 expandable.classList.remove('expanded');
             } else {
                 expandable.classList.add('expanded');
             }
+            // Если после ручного закрытия какой-то карточки все свёрнуты — синхронизируем состояние глобальной кнопки
             if (allExpanded) {
-                const visibleExpanded = document.querySelectorAll('.spell-card:not(.hidden) .spell-expandable.expanded').length;
-                const visibleTotal = document.querySelectorAll('.spell-card:not(.hidden) .spell-expandable').length;
-                if (visibleExpanded === 0) {
+                const visibleCards = document.querySelectorAll('.spell-card:not(.hidden)');
+                let anyExpanded = false;
+                visibleCards.forEach(card => {
+                    if (card.querySelector('.spell-expandable').classList.contains('expanded')) anyExpanded = true;
+                });
+                if (!anyExpanded) {
                     allExpanded = false;
                     const expandButton = document.getElementById('expandAllButton');
                     expandButton.querySelector('span').textContent = 'Раскрыть все';
@@ -9577,20 +9494,33 @@
             }
         }
         
+        // Отметить/снять отметку
         function toggleCheck(button) {
             button.classList.toggle('checked');
             saveAllCheckedSpells();
             if (filterActive) {
                 hideUncheckedSpells();
             }
-            resetExpandButton();
+            resetExpandButtonIfNeeded();
         }
         
         function saveAllCheckedSpells() {
             const checkedSpells = [];
             document.querySelectorAll('.spell-card').forEach(card => {
                 const checkButton = card.querySelector('.check-button');
-                const spellName = card.querySelector('.spell-title').textContent.trim();
+                const titleDiv = card.querySelector('.spell-title');
+                let spellName = '';
+                if (titleDiv) {
+                    // Извлекаем имя, убирая лишние пробелы и иконку
+                    const clone = titleDiv.cloneNode(true);
+                    const checkBtnClone = clone.querySelector('.check-button');
+                    if (checkBtnClone) checkBtnClone.remove();
+                    const iconClone = clone.querySelector('.spell-icon');
+                    if (iconClone) iconClone.remove();
+                    spellName = clone.textContent.trim();
+                } else {
+                    spellName = card.querySelector('.spell-header .spell-title')?.innerText || 'unknown';
+                }
                 if (checkButton && checkButton.classList.contains('checked')) {
                     checkedSpells.push(spellName);
                 }
@@ -9605,14 +9535,21 @@
                 const checkedSpells = JSON.parse(saved);
                 document.querySelectorAll('.spell-card').forEach(card => {
                     const checkButton = card.querySelector('.check-button');
-                    const spellName = card.querySelector('.spell-title').textContent.trim();
-                    if (checkedSpells.includes(spellName)) {
+                    const titleDiv = card.querySelector('.spell-title');
+                    let spellName = '';
+                    if (titleDiv) {
+                        const clone = titleDiv.cloneNode(true);
+                        const checkBtnClone = clone.querySelector('.check-button');
+                        if (checkBtnClone) checkBtnClone.remove();
+                        const iconClone = clone.querySelector('.spell-icon');
+                        if (iconClone) iconClone.remove();
+                        spellName = clone.textContent.trim();
+                    }
+                    if (checkedSpells.includes(spellName) && checkButton) {
                         checkButton.classList.add('checked');
                     }
                 });
-            } catch (e) {
-                console.error('Ошибка загрузки:', e);
-            }
+            } catch (e) {}
         }
         
         function toggleFilter() {
@@ -9633,7 +9570,7 @@
                 showAllSpells();
             }
             localStorage.setItem('filter-active', filterActive);
-            resetExpandButton();
+            resetExpandButtonIfNeeded();
         }
         
         function hideUncheckedSpells() {
@@ -9662,15 +9599,27 @@
                 filterButton.querySelector('i').className = 'fas fa-eye';
                 filterButton.classList.add('filter-active');
                 hideUncheckedSpells();
+            } else {
+                // по умолчанию фильтр выключен
+                filterActive = false;
+                showAllSpells();
             }
         }
         
-        function resetExpandButton() {
-            allExpanded = false;
-            const expandButton = document.getElementById('expandAllButton');
-            expandButton.querySelector('span').textContent = 'Раскрыть все';
-            expandButton.querySelector('i').className = 'fas fa-chevron-down';
-            expandButton.classList.remove('expanded-all');
+        function resetExpandButtonIfNeeded() {
+            // Сбрасываем флаг allExpanded, если были изменения в видимости или ручное действие
+            if (allExpanded) {
+                // Проверяем, все ли видимые карточки раскрыты
+                const visibleExpandables = document.querySelectorAll('.spell-card:not(.hidden) .spell-expandable');
+                const expandedCount = document.querySelectorAll('.spell-card:not(.hidden) .spell-expandable.expanded').length;
+                if (visibleExpandables.length === 0 || expandedCount !== visibleExpandables.length) {
+                    allExpanded = false;
+                    const expandButton = document.getElementById('expandAllButton');
+                    expandButton.querySelector('span').textContent = 'Раскрыть все';
+                    expandButton.querySelector('i').className = 'fas fa-chevron-down';
+                    expandButton.classList.remove('expanded-all');
+                }
+            }
         }
         
         function expandVisibleSpells() {
@@ -9695,14 +9644,27 @@
                 expandText.textContent = 'Раскрыть все';
                 expandIcon.className = 'fas fa-chevron-down';
                 expandButton.classList.remove('expanded-all');
+                allExpanded = false;
             } else {
                 expandVisibleSpells();
                 expandText.textContent = 'Свернуть все';
                 expandIcon.className = 'fas fa-chevron-up';
                 expandButton.classList.add('expanded-all');
+                allExpanded = true;
             }
-            allExpanded = !allExpanded;
         }
+        
+        // Глобальный обработчик кликов вне карточек, чтобы свернуть все (но не влияет на режим "раскрыть все", если активен)
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.spell-card') && !event.target.closest('.filter-button') && !event.target.closest('.expand-all-button')) {
+                // Если НЕ в режиме allExpanded, то можно свернуть любые открытые вручную карточки
+                if (!allExpanded) {
+                    document.querySelectorAll('.spell-expandable.expanded').forEach(item => {
+                        item.classList.remove('expanded');
+                    });
+                }
+            }
+        });
         
         document.addEventListener('DOMContentLoaded', function() {
             loadCheckedSpells();
@@ -9711,15 +9673,8 @@
             if (filterBtn) filterBtn.addEventListener('click', toggleFilter);
             const expandBtn = document.getElementById('expandAllButton');
             if (expandBtn) expandBtn.addEventListener('click', toggleExpandAll);
-        });
-        
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.spell-card') && !event.target.closest('.filter-button') && !event.target.closest('.expand-all-button')) {
-                document.querySelectorAll('.spell-expandable.expanded').forEach(item => {
-                    item.classList.remove('expanded');
-                });
-                resetExpandButton();
-            }
+            // Если после загрузки какие-то карточки скрыты и allExpanded = false — корректно
+            // Также проставляем обработчики для всех check-button (они уже с onclick)
         });
     </script>
 </body>
